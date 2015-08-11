@@ -1,5 +1,5 @@
 /*
- * mimemessage v0.0.1
+ * mimemessage v1.0.0
  * MIME messages for JavaScript (RFC 2045 & 2046)
  * Copyright 2015 Iñaki Baz Castillo at eFace2Face, inc. (https://eface2face.com)
  * License MIT

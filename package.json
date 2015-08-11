@@ -1,6 +1,6 @@
 {
   "name": "mimemessage",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "MIME messages for JavaScript (RFC 2045 & 2046)",
   "author": "Iñaki Baz Castillo at eFace2Face, inc. (https://eface2face.com)",
   "license": "MIT",
