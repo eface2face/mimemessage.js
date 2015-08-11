@@ -1,0 +1,20 @@
+From: Nathaniel Borenstein <nsb@bellcore.com>
+To: Ned Freed <ned@innosoft.com>
+Date: Sun, 21 Mar 1993 23:56:48 -0800 (PST)
+Subject: Sample message
+MIME-Version: 1.0
+Content-type: multipart/mixed; boundary="simple boundary"
+
+This is a preamble to be ignored.
+
+--simple boundary
+
+Body NOT ending with a linebreak.
+--simple boundary
+Content-type: text/plain; charset=us-ascii
+
+Body ending with a linebreak.
+
+--simple boundary--
+
+This is a epilogue to be ignored.

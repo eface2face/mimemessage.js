@@ -1,0 +1,40 @@
+MIME-Version: 1.0
+Message-ID: 1234
+Subject: Some Book
+From: Iñaki Baz Castillo <ibc@aliax.net>
+To: Alice <alice@atlanta.com>
+Content-Type: multipart/mixed; boundary=AAAA
+
+--AAAA
+
+body_AAAA_1
+--AAAA
+Content-Type: multipart/alternative; boundary=BBBB
+
+--BBBB
+content-type: text/plain
+
+body_BBBB_1
+
+--BBBB
+Content-Type: text/html
+x-foo: bar
+
+<h1>body_BBBB_1</h1>
+--BBBB--
+--AAAA
+Content-Type: text/plain;
+    charset = utf-8;
+    bar=yes
+CONTENT-Transfer-Encoding: quoted-printable
+
+body_AAAA_3
+
+--AAAA
+Content-Type: application/epub+zip;	name="Some Book.epub"
+Content-Disposition: attachment;filename="Some Book.epub"
+Content-Transfer-Encoding: BASE64
+X-Attachment-Id: f_icxs58pn0
+
+UEsDBBQAAAAAAAKfVkVvYassFAAAABQAAAAIAAAAbWltZXR5cGVhcHBsaWNhdGlvbi9lcHVi==
+--AAAA--
