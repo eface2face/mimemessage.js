@@ -100,7 +100,7 @@ A getter that returns the body of this MIME message or entity. The body can be a
 Returns `undefined` if there is no body.
 
 
-### `entity.body = value`
+### `entity.body = body`
 
 Sets the MIME body of the message to the given `body` (string or array of [Entity](Entity.md)).
 
