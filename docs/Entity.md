@@ -10,6 +10,25 @@ var entity = new mimemessage.Entity();
 ```
 
 
+## Properties
+
+
+### `entity.body`
+
+A getter that returns the body of this MIME message or entity. The body can be an array of MIME entities if this is a multipart message/entity.
+
+Returns `undefined` if there is no body.
+
+
+### `entity.body = body`
+
+Sets the MIME body of the message to the given `body` (string or array of [Entity](Entity.md)).
+
+If `body` is `null` the body is removed.
+
+*NOTE:* In case of a multipart message, further sub-entities can be safely added to the body later by using `entity.body.push(subEntity1);`.
+
+
 ## Methods
 
 
@@ -88,25 +107,6 @@ If `value` is `null` the header is removed.
 ```javascript
 entity.mimeHeader('Content-ID', '<1234@foo.com>');
 ```
-
-
-## Properties
-
-
-### `entity.body`
-
-A getter that returns the body of this MIME message or entity. The body can be an array of MIME entities if this is a multipart message/entity.
-
-Returns `undefined` if there is no body.
-
-
-### `entity.body = body`
-
-Sets the MIME body of the message to the given `body` (string or array of [Entity](Entity.md)).
-
-If `body` is `null` the body is removed.
-
-*NOTE:* In case of a multipart message, further sub-entities can be safely added to the body later by using `entity.body.push(subEntity1);`.
 
 
 ### `entity.toString()`
