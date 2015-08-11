@@ -90,6 +90,9 @@ entity.mimeHeader('Content-ID', '<1234@foo.com>');
 ```
 
 
+## Properties
+
+
 ### `entity.body`
 
 A getter that returns the body of this MIME message or entity. The body can be an array of MIME entities if this is a multipart message/entity.
