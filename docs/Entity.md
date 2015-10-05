@@ -1,6 +1,6 @@
 # Entity Class API
 
-A `Entity` instance represents a [MIME entity](https://tools.ietf.org/html/rfc2045) (which can be the top-level message or a MIME sub-entity in a [multipart message]((https://tools.ietf.org/html/rfc2046)). An entity has both headers and a body, which can also be a multipart body containing N MIME sub-entities.
+A `Entity` instance represents a [MIME entity](https://tools.ietf.org/html/rfc2045) (which can be the top-level message or a MIME sub-entity in a [multipart message](https://tools.ietf.org/html/rfc2046)). An entity has both headers and a body, which can also be a multipart body containing N MIME sub-entities.
 
 
 ## Constructor
