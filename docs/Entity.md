@@ -8,7 +8,7 @@ A `Entity` instance represents a [MIME entity](https://tools.ietf.org/html/rfc20
 ```javascript
 var entity = new mimemessage.Entity();
 ```
-
+mi
 
 ## Properties
 
@@ -105,7 +105,7 @@ Sets the MIME header with the given header `name` (string) and header `value` (s
 If `value` is `null` the header is removed.
 
 ```javascript
-entity.mimeHeader('Content-ID', '<1234@foo.com>');
+entity.header('Content-ID', '<1234@foo.com>');
 ```
 
 
