@@ -1,5 +1,5 @@
 /*
- * mimemessage v1.0.0
+ * mimemessage v1.0.1
  * MIME messages for JavaScript (RFC 2045 & 2046)
  * Copyright 2015 Iñaki Baz Castillo at eFace2Face, inc. (https://eface2face.com)
  * License MIT
@@ -109,7 +109,7 @@ Entity.prototype.isMultiPart = function () {
 };
 
 
-Entity.prototype.toString = function () {
+Entity.prototype.toString = function (options) {
 	var
 		raw = '',
 		name, header,
@@ -117,13 +117,22 @@ Entity.prototype.toString = function () {
 		contentType = this._headers['Content-Type'],
 		boundary;
 
-	// MIME headers.
-	for (name in this._headers) {
-		if (this._headers.hasOwnProperty(name)) {
-			header = this._headers[name];
+	options = options || {
+		noHeaders: false
+	};
 
-			raw += name + ': ' + header.value + '\r\n';
+	if (!options.noHeaders) {
+		// MIME headers.
+		for (name in this._headers) {
+			if (this._headers.hasOwnProperty(name)) {
+				header = this._headers[name];
+
+				raw += name + ': ' + header.value + '\r\n';
+			}
 		}
+
+		// Separator line.
+		raw += '\r\n';
 	}
 
 	// Body.
@@ -131,13 +140,14 @@ Entity.prototype.toString = function () {
 		boundary = contentType.params.boundary;
 
 		for (i = 0, len = this._body.length; i < len; i++) {
-			raw += '\r\n--' + boundary + '\r\n' + this._body[i].toString();
+			if (i > 0) {
+				raw += '\r\n';
+			}
+			raw += '--' + boundary + '\r\n' + this._body[i].toString();
 		}
 		raw += '\r\n--' + boundary + '--';
 	} else if (this._body) {
-		raw += '\r\n' + this._body.toString();
-	} else {
-		raw += '\r\n';
+		raw += this._body.toString();
 	}
 
 	return raw;

@@ -109,13 +109,17 @@ entity.mimeHeader('Content-ID', '<1234@foo.com>');
 ```
 
 
-### `entity.toString()`
+### `entity.toString(options)`
 
 Serializes the MIME message/entity into a single string.
 
 ```javascript
 myWebSocket.send(entity.toString());
 ```
+
+If given, `options` object may contain the following fields:
+
+* `noHeaders` (Boolean): Don't print MIME headers of the top-level MIME message/entity.
 
 
 ### `entity.isMultiPart()`
