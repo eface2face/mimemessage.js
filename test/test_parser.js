@@ -139,4 +139,28 @@ describe('Parser', function () {
 		expect(normalizedParsedPrinted).to.be(normalizedRawPrinted);
 	});
 
+	it('must parse multipart msg4', function () {
+		var
+			raw = tools.readFile('msg4'),
+			msg = mimemessage.parse(raw),
+			part1, part2;
+
+		expect(msg).to.be.ok();
+		expect(msg.isMultiPart()).to.be.ok();
+		expect(msg.contentType().type).to.eql('multipart');
+		expect(msg.contentType().subtype).to.eql('mixed');
+		expect(msg.contentType().fulltype).to.eql('multipart/mixed');
+		expect(msg.contentType().params).to.eql({
+			boundary: '----=_Part_68_509885327.1447152748066'
+		});
+
+		part1 = msg.body[0];
+		expect(part1).to.be.ok();
+
+		part2 = msg.body[1];
+		expect(part2).to.be.ok();
+		expect(part2.contentType().type).to.eql('message');
+		expect(part2.contentType().subtype).to.eql('cpim');
+	});
+
 });

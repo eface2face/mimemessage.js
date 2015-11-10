@@ -3,7 +3,7 @@ Message-ID: 1234
 Subject: Some Book
 From: Iñaki Baz Castillo <ibc@aliax.net>
 To: Alice <alice@atlanta.com>
-Content-Type: multipart/mixed; boundary=AAAA
+Content-Type: multipart/mixed; boundary="AAAA"
 
 --AAAA
 
