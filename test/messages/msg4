@@ -8,8 +8,8 @@ KE ASE
 ------=_Part_68_509885327.1447152748066
 Content-Type: message/cpim
 
-From: <sip:alice@eface2face.com>
-To: <sip:bob@eface2face.com>
+From: <sip:alice@example.com>
+To: <sip:bob@example.com>
 NS: imdn <urn:ietf:params:imdn>
 imdn.Message-ID: dcf2ebb0-859f-11e5-b577-e1a44228c85f
 DateTime: 2015-11-07T22:35+0000
