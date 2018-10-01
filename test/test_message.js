@@ -61,4 +61,16 @@ describe('Message', function () {
 		}));
 	});
 
+	it('must parse header custom with ;', function () {
+		const contentType = 'image/png; filename="Fleshing out a sketch of a bird for a friend! - ;.png"; name="Fleshing out a sketch of a bird for a friend! - ;.png"';
+		const name = 'Fleshing out a sketch of a bird for a friend! - ;.png';
+		var msg = mimemessage.factory({
+				contentType
+		});
+
+		expect(msg.contentType().params).to.eql({
+			name, filename: name
+		});
+	});
+
 });
