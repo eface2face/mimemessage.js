@@ -1,22 +1,18 @@
-var
-	/**
-	 * Dependencies.
-	 */
-	path = require('path'),
-	fs = require('fs'),
-
-	/**
-	 * Constants.
-	 */
-	MESSAGES_FOLDER = 'messages';
+/**
+ * Dependencies.
+ */
+const path = require('path');
+const fs = require('fs');
+/**
+ * Constants.
+ */
+const MESSAGES_FOLDER = 'messages';
 
 
 module.exports.readFile = function (filename) {
-	var
-		filepath = path.join(__dirname, MESSAGES_FOLDER, filename),
-		content = fs.readFileSync(filepath, 'utf8');
+    const filepath = path.join(__dirname, MESSAGES_FOLDER, filename);
 
-	// NOTE: Return this in case files are not CRLF line ended.
-	// return content.replace(/\n/g, '\r\n');
-	return content;
+    // NOTE: Return this in case files are not CRLF line ended.
+    // return content.replace(/\n/g, '\r\n');
+    return fs.readFileSync(filepath, 'utf8');
 };

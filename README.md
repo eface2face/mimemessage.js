@@ -156,6 +156,7 @@ In the browser run `mimemessage.debug.enable('mimemessage*');` and reload the pa
 ## Author
 
 Iñaki Baz Castillo
+Kay Lukas
 
 
 ## License
