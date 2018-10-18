@@ -70,4 +70,40 @@ describe('Message', () => {
         });
     });
 
+
+    it('must parse header with unicode', () => {
+        const name = '🗳🧙️📩❤️💡😒🗳🗃😍💡😂.png';
+        const contentType = `image/png; filename="${name}"; name="${name}"`;
+        const msg = mimemessage.factory({
+            contentType
+        });
+
+        expect(/[^\u0000-\u00ff]/.test(msg.toString())).to.be(false);
+        expect(/[^\u0000-\u00ff]/.test(msg.toString({ unicode: true }))).to.be(true);
+    });
+
+    it('must encode content', () => {
+        const entity = mimemessage.factory({
+            contentType: 'text/plain; filename=tada; name=tada',
+            contentTransferEncoding: 'base64',
+            body: '0'.repeat(200)
+        });
+
+        expect(entity.toString()).to.equal(`Content-Type: text/plain; filename=tada; name=tada
+Content-Transfer-Encoding: base64
+
+MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAw
+MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAw
+MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAw
+MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA=`.replace(/\n/g, '\r\n'));
+
+        const entityunicode = mimemessage.factory({
+            contentType: 'text/plain; filename=🗳🧙️📩❤️💡😒🗳🗃😍💡😂; name=🗳🧙️📩❤️💡😒🗳🗃😍💡😂',
+            contentTransferEncoding: 'quoted-printable',
+            body: '🗳🧙️📩❤️💡😒🗳🗃😍💡😂'.repeat(200)
+        });
+
+        expect(mimemessage.parse(entityunicode.toString()).body).to.equal('🗳🧙️📩❤️💡😒🗳🗃😍💡😂'.repeat(200));
+    });
+
 });

@@ -62,6 +62,7 @@ describe('Parser', () => {
         expect(msg.contentType().params).to.eql({
             boundary: 'AAAA'
         });
+        expect(msg.header('from')).to.eql('Iñaki Baz Castillo <ibc@aliax.net>');
         const partAAAA1 = msg.body[0];
 
         expect(partAAAA1).to.be.ok();
@@ -116,7 +117,7 @@ describe('Parser', () => {
         expect(partAAAA4.header('content-disposition')).to.eql('attachment;filename="Some Book.epub"');
         expect(partAAAA4.contentTransferEncoding()).to.eql('base64');
         expect(partAAAA4.header('x-attachment-id')).to.eql('f_icxs58pn0');
-        expect(partAAAA4.body).to.be('UEsDBBQAAAAAAAKfVkVvYassFAAAABQAAAAIAAAAbWltZXR5cGVhcHBsaWNhdGlvbi9lcHVi==');
+        expect(partAAAA4.body).to.be(Buffer.from('UEsDBBQAAAAAAAKfVkVvYassFAAAABQAAAAIAAAAbWltZXR5cGVhcHBsaWNhdGlvbi9lcHVi==', 'base64').toString('binary'));
         const normalizedRawPrinted = raw
             .toLowerCase()
             .replace(/[\t ]+/g, ' ')
@@ -128,6 +129,8 @@ describe('Parser', () => {
             .replace(/[\t ]+/g, ' ')
             .trim();
 
+        console.log(normalizedParsedPrinted);
+        console.log(normalizedRawPrinted);
         expect(normalizedParsedPrinted).to.be(normalizedRawPrinted);
     });
 

@@ -1,7 +1,7 @@
 MIME-Version: 1.0
 Message-ID: 1234
 Subject: Some Book
-From: Iñaki Baz Castillo <ibc@aliax.net>
+From:  =?utf-8?q?I=c3=b1aki?= Baz Castillo <ibc@aliax.net>
 To: Alice <alice@atlanta.com>
 Content-Type: multipart/mixed; boundary="AAAA"
 
@@ -36,5 +36,5 @@ Content-Disposition: attachment;filename="Some Book.epub"
 Content-Transfer-Encoding: BASE64
 X-Attachment-Id: f_icxs58pn0
 
-UEsDBBQAAAAAAAKfVkVvYassFAAAABQAAAAIAAAAbWltZXR5cGVhcHBsaWNhdGlvbi9lcHVi==
+UEsDBBQAAAAAAAKfVkVvYassFAAAABQAAAAIAAAAbWltZXR5cGVhcHBsaWNhdGlvbi9lcHVi
 --AAAA--

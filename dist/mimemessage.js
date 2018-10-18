@@ -4,8 +4,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
+var rfc2047 = _interopDefault(require('rfc2047'));
 var debug = _interopDefault(require('debug'));
-var randomString = _interopDefault(require('random-string'));
 
 function _typeof(obj) {
   if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
@@ -132,6 +132,133 @@ function parseParams(rawParams) {
   }, Object.create(null));
 }
 
+var RFC2045_LIMIT = 76;
+
+var wrapline = function wrapline(line) {
+  var escape = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+  var limit = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : RFC2045_LIMIT;
+  var lineCount = Math.ceil(line.length / limit);
+  var result = Array.from({
+    length: lineCount
+  }, function (_, i) {
+    return line.substring(limit * i, limit * (i + 1));
+  });
+  return result.join(escape + '\r\n');
+}; // the newlines in mime messages are \r\n. This function expects \n as incoming lines and produces \r\n newlines.
+
+
+var wraplines = function wraplines(lines) {
+  var escape = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+  var limit = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : RFC2045_LIMIT;
+  return lines.split('\n').map(function (line) {
+    return wrapline(line, escape, limit);
+  }).join('\r\n');
+}; // Don't escape newlines, tabs, everything between space and ~ save the = sign.
+
+
+var MATCH_ESCAPE_CHARS = /[^\t\n\r\x20-\x3C\x3E-\x7E]/g;
+
+var encodeQPSequence = function encodeQPSequence(char) {
+  return '=' + ('00' + char.charCodeAt(0).toString(16).toUpperCase()).substr(-2);
+};
+
+var encodeQPSequences = function encodeQPSequences(input) {
+  return input.replace(MATCH_ESCAPE_CHARS, encodeQPSequence);
+};
+
+var normalLinebreaks = function normalLinebreaks(input) {
+  return input.replace(/(\r\n|\n|\r)/g, '\n');
+}; // restore wrapping in escape sequences ==\r\n0D, =0\r\nD -> =0D=\r\n
+
+
+var restoreQPSequences = function restoreQPSequences(input) {
+  return input.replace(/(?=.{0,2}=\r\n)(=(=\r\n)?[0-9A-F](=\r\n)?[0-9A-F])/g, function (seq) {
+    return seq.replace(/=\r\n/, '') + '=\r\n';
+  });
+};
+
+var wrapQPLines = function wrapQPLines(input) {
+  return restoreQPSequences(wraplines(input, '=', RFC2045_LIMIT - 2));
+};
+
+var encodeQPTrailingSpace = function encodeQPTrailingSpace(input) {
+  return input.replace(/ $/gm, ' =\r\n\r\n');
+};
+
+var encodeUTF8 = function encodeUTF8(value) {
+  // only encode if it has > 8 bits, otherwise it's fine
+  // eslint-disable-next-line no-control-regex
+  if (!/[^\u0000-\u00ff]/.test(value)) {
+    return value;
+  }
+
+  return unescape(encodeURIComponent(value));
+};
+
+var decodeUTF8 = function decodeUTF8(value) {
+  try {
+    return decodeURIComponent(escape(value));
+  } catch (e) {
+    return value;
+  }
+};
+
+var base64encode = typeof btoa === 'undefined' ? function (str) {
+  return Buffer.from(str, 'binary').toString('base64');
+} : btoa;
+var base64decode = typeof atob === 'undefined' ? function (str) {
+  return Buffer.from(str, 'base64').toString('binary');
+} : atob;
+
+var encodeBase64 = function encodeBase64(value) {
+  return wraplines(base64encode(value));
+};
+
+var decodeBase64 = function decodeBase64(value) {
+  return base64decode(value);
+};
+/**
+ * Quoted-Printable, or QP encoding, is an encoding using printable ASCII characters
+ * (alphanumeric and the equals sign =) to transmit 8-bit data over a 7-bit data path)
+ * Any 8-bit byte value may be encoded with 3 characters: an = followed by two hexadecimal digits (0–9 or A–F)
+ * representing the byte's numeric value. For example, an ASCII form feed character (decimal value 12) can be
+ * represented by "=0C", and an ASCII equal sign (decimal value 61) must be represented by =3D.
+ * All characters except printable ASCII characters or end of line characters (but also =)
+ * must be encoded in this fashion.
+ *
+ * All printable ASCII characters (decimal values between 33 and 126) may be represented by themselves, except =
+ * (decimal 61).
+ *
+ * @param binarydata
+ * @return 7-bit encoding of the input using QP encoding
+ */
+
+
+var encodeQP = function encodeQP(binarydata) {
+  return encodeQPTrailingSpace(wrapQPLines(normalLinebreaks(encodeQPSequences(encodeUTF8(binarydata)))));
+};
+
+var removeSoftBreaks = function removeSoftBreaks(value) {
+  return value.replace(/=(\r\n|\n|\r)|/g, '');
+};
+
+var decodeQuotedPrintables = function decodeQuotedPrintables(value) {
+  return value.replace(/=([0-9A-F][0-9A-F])/gm, function (match, contents) {
+    return String.fromCharCode(parseInt(contents, 16));
+  });
+};
+
+var decodeQP = function decodeQP(value) {
+  return decodeUTF8(decodeURIComponent(escape(decodeQuotedPrintables(removeSoftBreaks(value)))));
+};
+
+var encoding = {
+  encodeBase64: encodeBase64,
+  decodeBase64: decodeBase64,
+  encodeQP: encodeQP,
+  decodeQP: decodeQP
+};
+
 /**
  * Expose the parse function and some util funtions within it.
  */
@@ -253,6 +380,10 @@ function parseEntity(entity, rawEntity, topLevel) {
       }
     } // Non multipart internalBody.
 
+  } else if (entity.header('Content-Transfer-Encoding') === 'base64') {
+    entity.internalBody = encoding.decodeBase64(rawBody);
+  } else if (entity.header('Content-Transfer-Encoding') === 'quoted-printable') {
+    entity.internalBody = encoding.decodeQP(rawBody);
   } else {
     entity.internalBody = rawBody;
   }
@@ -335,6 +466,7 @@ function parseHeaderValue(rule, value) {
     data.value = value;
   }
 
+  data.value = rfc2047.decode(data.value);
   return data;
 }
 
@@ -424,15 +556,19 @@ Entity.prototype.toString = function () {
   var _this = this;
 
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
-    noHeaders: false
+    noHeaders: false,
+    unicode: false
   };
   var raw = '';
   var contentType = this.headers['Content-Type'];
+  var encode = options.unicode ? function (x) {
+    return x;
+  } : rfc2047.encode;
 
   if (!options.noHeaders) {
     // MIME headers.
     var headers = Object.keys(this.headers).map(function (name) {
-      return name + ': ' + _this.headers[name].value + '\r\n';
+      return name + ': ' + encode(_this.headers[name].value) + '\r\n';
     });
     raw = headers.join('') + '\r\n';
   } // Body.
@@ -448,17 +584,38 @@ Entity.prototype.toString = function () {
         raw += '\r\n';
       }
 
-      raw += '--' + boundary + '\r\n' + this.internalBody[i].toString();
+      raw += '--' + boundary + '\r\n' + this.internalBody[i].toString(options);
     }
 
     raw += '\r\n--' + boundary + '--';
   } else if (typeof this.internalBody === 'string') {
-    raw += this.internalBody;
+    var _ref = this.headers['Content-Transfer-Encoding'] || {},
+        value = _ref.value;
+
+    if (value === 'base64') {
+      raw += encoding.encodeBase64(this.internalBody);
+    } else if (value === 'quoted-printable') {
+      raw += encoding.encodeQP(this.internalBody);
+    } else {
+      raw += this.internalBody;
+    }
   } else if (_typeof(this.internalBody) === 'object') {
     raw += JSON.stringify(this.internalBody);
   }
 
   return raw;
+};
+
+var random16bitHex = function random16bitHex() {
+  return Math.floor(Math.random() * (2 << 15)).toString(16).padStart(4, 0);
+};
+
+var random128bitHex = function random128bitHex() {
+  return new Array(8).fill(null).map(random16bitHex).join('');
+};
+
+var generateBoundary = function generateBoundary() {
+  return "---------------------".concat(random128bitHex());
 };
 /**
  * Private API.
@@ -471,9 +628,9 @@ function setBody(body) {
 
   if (Array.isArray(body)) {
     if (!contentType || contentType.type !== 'multipart') {
-      this.contentType('multipart/mixed;boundary=' + randomString());
+      this.contentType('multipart/mixed;boundary=' + generateBoundary());
     } else if (!contentType.params.boundary) {
-      this.contentType(contentType.fulltype + ';boundary=' + randomString());
+      this.contentType(contentType.fulltype + ';boundary=' + generateBoundary());
     } // Single internalBody.
 
   } else if (!contentType || contentType.type === 'multipart') {
