@@ -155,7 +155,7 @@ In the browser run `mimemessage.debug.enable('mimemessage*');` and reload the pa
 
 ## Author
 
-Iñaki Baz Castillo at [eFace2Face, inc.](https://eface2face.com)
+Iñaki Baz Castillo
 
 
 ## License

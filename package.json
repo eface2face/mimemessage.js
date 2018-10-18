@@ -1,8 +1,8 @@
 {
   "name": "mimemessage",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "MIME messages for JavaScript (RFC 2045 & 2046)",
-  "author": "Iñaki Baz Castillo at eFace2Face, inc. (https://eface2face.com)",
+  "author": "Iñaki Baz Castillo",
   "license": "MIT",
   "keywords": [
     "mime"
@@ -17,21 +17,22 @@
     "url": "https://github.com/eface2face/mimemessage.js/issues"
   },
   "dependencies": {
-    "debug": "^2.2.0",
-    "random-string": "^0.1.2"
+    "debug": "^3.1.0",
+    "random-string": "^0.2.0"
   },
   "devDependencies": {
-    "browserify": "^12.0.1",
+    "browserify": "^16.2.2",
     "expect.js": "^0.3.1",
-    "gulp": "git+https://github.com/gulpjs/gulp.git#4.0",
+    "gulp": "^4.0.0",
     "gulp-filelog": "^0.4.1",
-    "gulp-header": "^1.7.1",
-    "gulp-jscs": "^3.0.2",
-    "gulp-jscs-stylish": "^1.2.1",
-    "gulp-jshint": "^1.12.0",
-    "gulp-mocha": "^2.1.3",
-    "jshint-stylish": "~2.0.1",
-    "vinyl-source-stream": "^1.1.0"
+    "gulp-header": "^2.0.5",
+    "gulp-jscs": "^4.1.0",
+    "gulp-jscs-stylish": "^1.4.0",
+    "gulp-jshint": "^2.1.0",
+    "gulp-mocha": "^5.0.0",
+    "jshint": "^2.9.5",
+    "jshint-stylish": "^2.2.1",
+    "vinyl-source-stream": "^2.0.0"
   },
   "engines": {
     "node": ">=0.10.32"
