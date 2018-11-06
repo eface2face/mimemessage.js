@@ -1,8 +1,13 @@
 {
   "presets": [
     [
-      "@babel/preset-env",
+      "@babel/env",
       {
+        "targets": {
+          "browsers": [
+            "ie 11"
+          ]
+        },
         "modules": false
       }
     ]
