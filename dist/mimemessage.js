@@ -514,23 +514,27 @@ Entity.prototype.contentType = function (value) {
 Entity.prototype.contentDisposition = function (value) {
   // Get.
   if (!value && value !== null) {
-    return this._headers['Content-Disposition']; // Set.
-  } else if (value) {
-    this._headers['Content-Disposition'] = parseHeaderValue$1(grammar_1.headerRules['Content-Disposition'], value); // Delete.
+    return this.headers['Content-Disposition']; // Set.
+  }
+
+  if (value) {
+    this.headers['Content-Disposition'] = parseHeaderValue$1(grammar_1.headerRules['Content-Disposition'], value); // Delete.
   } else {
-    delete this._headers['Content-Disposition'];
+    delete this.headers['Content-Disposition'];
   }
 };
 
 Entity.prototype.contentTransferEncoding = function (value) {
-  var contentTransferEncoding = this._headers['Content-Transfer-Encoding']; // Get.
+  var contentTransferEncoding = this.headers['Content-Transfer-Encoding']; // Get.
 
   if (!value && value !== null) {
     return contentTransferEncoding ? contentTransferEncoding.value : undefined; // Set.
-  } else if (value) {
-    this._headers['Content-Transfer-Encoding'] = parseHeaderValue$1(grammar_1.headerRules['Content-Transfer-Encoding'], value); // Delete.
+  }
+
+  if (value) {
+    this.headers['Content-Transfer-Encoding'] = parseHeaderValue$1(grammar_1.headerRules['Content-Transfer-Encoding'], value); // Delete.
   } else {
-    delete this._headers['Content-Transfer-Encoding'];
+    delete this.headers['Content-Transfer-Encoding'];
   }
 };
 

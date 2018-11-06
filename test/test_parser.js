@@ -1,14 +1,8 @@
-<<<<<<< HEAD
-/**
- * Dependencies.
- */
 const expect = require('expect.js');
 const mimemessage = require('../');
 const tools = require('./tools');
 
-
 describe('Parser', () => {
-
     it('must parse msg1', () => {
         const raw = tools.readFile('msg1');
         const msg = mimemessage.parse(raw);
@@ -118,20 +112,24 @@ describe('Parser', () => {
         expect(partAAAA4.header('content-disposition')).to.eql('attachment;filename="Some Book.epub"');
         expect(partAAAA4.contentTransferEncoding()).to.eql('base64');
         expect(partAAAA4.header('x-attachment-id')).to.eql('f_icxs58pn0');
-        expect(partAAAA4.body).to.be(Buffer.from('UEsDBBQAAAAAAAKfVkVvYassFAAAABQAAAAIAAAAbWltZXR5cGVhcHBsaWNhdGlvbi9lcHVi==', 'base64').toString('binary'));
+        expect(partAAAA4.body).to.be(
+            Buffer.from(
+                'UEsDBBQAAAAAAAKfVkVvYassFAAAABQAAAAIAAAAbWltZXR5cGVhcHBsaWNhdGlvbi9lcHVi==',
+                'base64'
+            ).toString('binary')
+        );
         const normalizedRawPrinted = raw
             .toLowerCase()
             .replace(/[\t ]+/g, ' ')
             .replace(/\r\n[\t ]+/g, ' ')
             .trim();
 
-        const normalizedParsedPrinted = msg.toString()
+        const normalizedParsedPrinted = msg
+            .toString()
             .toLowerCase()
             .replace(/[\t ]+/g, ' ')
             .trim();
 
-        console.log(normalizedParsedPrinted);
-        console.log(normalizedRawPrinted);
         expect(normalizedParsedPrinted).to.be(normalizedRawPrinted);
     });
 
@@ -156,41 +154,37 @@ describe('Parser', () => {
         expect(part2.contentType().type).to.eql('message');
         expect(part2.contentType().subtype).to.eql('cpim');
     });
-
 });
 
-
 describe('Parse headers', () => {
+    const headers = require('./headers/header1.json');
+    const formatted = mimemessage.factory(headers);
 
-	const headers = require('./headers/header1.json');
-	const formatted = mimemessage.factory(headers);
+    it('must parse headers', () => {
+        expect(formatted).to.be.ok();
+    });
 
-	it('must parse headers', () => {
-		expect(formatted).to.be.ok();
-	});
+    it('must parse contentType', () => {
+        const contentType = formatted.contentType();
+        expect(contentType.type).to.eql('image');
+        expect(contentType.subtype).to.eql('jpeg');
+        expect(contentType.fulltype).to.eql('image/jpeg');
+        expect(contentType.params).to.eql({
+            name: 'IMG_83201.jpeg'
+        });
+    });
 
-	it('must parse contentType', () => {
-		const contentType = formatted.contentType();
-		expect(contentType.type).to.eql('image');
-		expect(contentType.subtype).to.eql('jpeg');
-		expect(contentType.fulltype).to.eql('image/jpeg');
-		expect(contentType.params).to.eql({
-			name: 'IMG_83201.jpeg'
-		});
-	});
+    it('must parse contentDisposition', () => {
+        const contentDisposition = formatted.contentDisposition();
+        expect(contentDisposition.fulltype).to.eql('inline; filename="IMG_83201.jpeg"; size=91134');
+        expect(contentDisposition.params).to.eql({
+            filename: 'IMG_83201.jpeg',
+            size: '91134'
+        });
+    });
 
-	it('must parse contentDisposition', () => {
-		const contentDisposition = formatted.contentDisposition();
-		expect(contentDisposition.fulltype).to.eql('inline; filename=\"IMG_83201.jpeg\"; size=91134');
-		expect(contentDisposition.params).to.eql({
-			filename: 'IMG_83201.jpeg',
-			size: '91134'
-		});
-	});
-
-	it('must parse contentTransferEncoding', () => {
-		const contentTransferEncoding = formatted.contentTransferEncoding();
-		expect(contentTransferEncoding).to.eql('base64');
-	});
-
+    it('must parse contentTransferEncoding', () => {
+        const contentTransferEncoding = formatted.contentTransferEncoding();
+        expect(contentTransferEncoding).to.eql('base64');
+    });
 });
