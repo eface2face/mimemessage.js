@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * Dependencies.
  */
@@ -155,5 +156,41 @@ describe('Parser', () => {
         expect(part2.contentType().type).to.eql('message');
         expect(part2.contentType().subtype).to.eql('cpim');
     });
+
+});
+
+
+describe('Parse headers', () => {
+
+	const headers = require('./headers/header1.json');
+	const formatted = mimemessage.factory(headers);
+
+	it('must parse headers', () => {
+		expect(formatted).to.be.ok();
+	});
+
+	it('must parse contentType', () => {
+		const contentType = formatted.contentType();
+		expect(contentType.type).to.eql('image');
+		expect(contentType.subtype).to.eql('jpeg');
+		expect(contentType.fulltype).to.eql('image/jpeg');
+		expect(contentType.params).to.eql({
+			name: 'IMG_83201.jpeg'
+		});
+	});
+
+	it('must parse contentDisposition', () => {
+		const contentDisposition = formatted.contentDisposition();
+		expect(contentDisposition.fulltype).to.eql('inline; filename=\"IMG_83201.jpeg\"; size=91134');
+		expect(contentDisposition.params).to.eql({
+			filename: 'IMG_83201.jpeg',
+			size: '91134'
+		});
+	});
+
+	it('must parse contentTransferEncoding', () => {
+		const contentTransferEncoding = formatted.contentTransferEncoding();
+		expect(contentTransferEncoding).to.eql('base64');
+	});
 
 });
