@@ -60,6 +60,14 @@ grammar.headerRules = {
       };
     }
   },
+  'Content-Disposition': {
+    reg: function reg(value) {
+      return {
+        fulltype: value,
+        params: parseParams(value)
+      };
+    }
+  },
   'Content-Transfer-Encoding': {
     reg: function reg(value) {
       var match = value.match(REGEXP_CONTENT_TRANSFER_ENCODING);
@@ -503,17 +511,26 @@ Entity.prototype.contentType = function (value) {
   }
 };
 
+Entity.prototype.contentDisposition = function (value) {
+  // Get.
+  if (!value && value !== null) {
+    return this._headers['Content-Disposition']; // Set.
+  } else if (value) {
+    this._headers['Content-Disposition'] = parseHeaderValue$1(grammar_1.headerRules['Content-Disposition'], value); // Delete.
+  } else {
+    delete this._headers['Content-Disposition'];
+  }
+};
+
 Entity.prototype.contentTransferEncoding = function (value) {
-  var contentTransferEncoding = this.headers['Content-Transfer-Encoding']; // Get.
+  var contentTransferEncoding = this._headers['Content-Transfer-Encoding']; // Get.
 
   if (!value && value !== null) {
     return contentTransferEncoding ? contentTransferEncoding.value : undefined; // Set.
-  }
-
-  if (value) {
-    this.headers['Content-Transfer-Encoding'] = parseHeaderValue$1(grammar_1.headerRules['Content-Transfer-Encoding'], value); // Delete.
+  } else if (value) {
+    this._headers['Content-Transfer-Encoding'] = parseHeaderValue$1(grammar_1.headerRules['Content-Transfer-Encoding'], value); // Delete.
   } else {
-    delete this.headers['Content-Transfer-Encoding'];
+    delete this._headers['Content-Transfer-Encoding'];
   }
 };
 
@@ -658,6 +675,11 @@ function factory() {
 
   if (data.contentType) {
     entity.contentType(data.contentType);
+  } // Add Content-Type.
+
+
+  if (data.contentDisposition) {
+    entity.contentDisposition(data.contentDisposition);
   } // Add Content-Transfer-Encoding.
 
 
