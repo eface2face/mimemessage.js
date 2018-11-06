@@ -679,7 +679,7 @@ function factory() {
 
   if (data.contentType) {
     entity.contentType(data.contentType);
-  } // Add Content-Type.
+  } // Add Content-Disposition.
 
 
   if (data.contentDisposition) {
