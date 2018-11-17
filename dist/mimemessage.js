@@ -219,11 +219,11 @@ var base64decode = typeof atob === 'undefined' ? function (str) {
 } : atob;
 
 var encodeBase64 = function encodeBase64(value) {
-  return wraplines(base64encode(encodeUTF8(value)));
+  return wraplines(encodeUTF8(base64encode(value)));
 };
 
 var decodeBase64 = function decodeBase64(value) {
-  return base64decode(decodeUTF8(value));
+  return decodeUTF8(base64decode(value));
 };
 /**
  * Quoted-Printable, or QP encoding, is an encoding using printable ASCII characters
