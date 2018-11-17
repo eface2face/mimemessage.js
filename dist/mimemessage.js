@@ -219,7 +219,7 @@ var base64decode = typeof atob === 'undefined' ? function (str) {
 } : atob;
 
 var encodeBase64 = function encodeBase64(value) {
-  return wraplines(encodeUTF8(base64encode(value)));
+  return wraplines(base64encode(encodeUTF8(value)));
 };
 
 var decodeBase64 = function decodeBase64(value) {
