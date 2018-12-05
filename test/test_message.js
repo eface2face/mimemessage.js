@@ -98,12 +98,44 @@ MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAw
 MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA=`.replace(/\n/g, '\r\n'));
 
         const entityunicode = mimemessage.factory({
-            contentType: 'text/plain; filename=🗳🧙️📩❤️💡😒🗳🗃😍💡😂; name=🗳🧙️📩❤️💡😒🗳🗃😍💡😂',
+            contentType: 'text/plain; filename=売伝済屯講天表禁衣佐後山; name=正見打実労叫投樫媛由峰図読時要位; charset=utf-8',
             contentTransferEncoding: 'quoted-printable',
-            body: '🗳🧙️📩❤️💡😒🗳🗃😍💡😂'.repeat(200)
+            body: '🗳🧙️📩❤️💡😒正見打実労叫投樫媛由峰図読時要位🗳😍💡😂'.repeat(200)
         });
 
-        expect(mimemessage.parse(entityunicode.toString()).body).to.equal('🗳🧙️📩❤️💡😒🗳🗃😍💡😂'.repeat(200));
+        const parsed = mimemessage.parse(entityunicode.toString());
+        expect(parsed.contentType().params.name).to.equal('正見打実労叫投樫媛由峰図読時要位');
+        expect(parsed.contentType().params.filename).to.equal('売伝済屯講天表禁衣佐後山');
+        expect(parsed.body).to.equal('🗳🧙️📩❤️💡😒正見打実労叫投樫媛由峰図読時要位🗳😍💡😂'.repeat(200));
+    });
+
+    it('must encode utf8 content', () => {
+        const entity = mimemessage.factory({
+            contentType: 'text/plain; filename=tada; name=tada; charset=utf-8',
+            contentTransferEncoding: 'quoted-printable',
+            body: 'ó'.repeat(200)
+        });
+
+        expect(entity.toString()).to.equal(`Content-Type: text/plain; filename=tada; name=tada; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=
+=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=
+=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=
+=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=
+=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=
+=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=
+=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=
+=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=
+=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=
+=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=
+=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=
+=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=
+=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=
+=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=
+=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=
+=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=B3=C3=
+=B3=C3=B3=C3=B3`.replace(/\n/g, '\r\n'));
     });
 
 });

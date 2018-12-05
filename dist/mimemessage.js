@@ -194,12 +194,6 @@ var encodeQPTrailingSpace = function encodeQPTrailingSpace(input) {
 };
 
 var encodeUTF8 = function encodeUTF8(value) {
-  // only encode if it has > 8 bits, otherwise it's fine
-  // eslint-disable-next-line no-control-regex
-  if (!/[^\u0000-\u00ff]/.test(value)) {
-    return value;
-  }
-
   return unescape(encodeURIComponent(value));
 };
 
@@ -219,7 +213,7 @@ var base64decode = typeof atob === 'undefined' ? function (str) {
 } : atob;
 
 var encodeBase64 = function encodeBase64(value) {
-  return wraplines(base64encode(encodeUTF8(value)));
+  return wraplines(base64encode(value));
 };
 
 var decodeBase64 = function decodeBase64(value) {
@@ -243,7 +237,7 @@ var decodeBase64 = function decodeBase64(value) {
 
 
 var encodeQP = function encodeQP(binarydata) {
-  return encodeQPTrailingSpace(wrapQPLines(normalLinebreaks(encodeQPSequences(encodeUTF8(binarydata)))));
+  return encodeQPTrailingSpace(wrapQPLines(normalLinebreaks(encodeQPSequences(binarydata))));
 };
 
 var removeSoftBreaks = function removeSoftBreaks(value) {
@@ -257,14 +251,16 @@ var decodeQuotedPrintables = function decodeQuotedPrintables(value) {
 };
 
 var decodeQP = function decodeQP(value) {
-  return decodeUTF8(decodeURIComponent(escape(decodeQuotedPrintables(removeSoftBreaks(value)))));
+  return decodeQuotedPrintables(removeSoftBreaks(value));
 };
 
 var encoding = {
   encodeBase64: encodeBase64,
   decodeBase64: decodeBase64,
   encodeQP: encodeQP,
-  decodeQP: decodeQP
+  decodeQP: decodeQP,
+  encodeUTF8: encodeUTF8,
+  decodeUTF8: decodeUTF8
 };
 
 /**
@@ -388,12 +384,30 @@ function parseEntity(entity, rawEntity, topLevel) {
       }
     } // Non multipart internalBody.
 
-  } else if (entity.header('Content-Transfer-Encoding') === 'base64') {
-    entity.internalBody = encoding.decodeBase64(rawBody);
-  } else if (entity.header('Content-Transfer-Encoding') === 'quoted-printable') {
-    entity.internalBody = encoding.decodeQP(rawBody);
   } else {
-    entity.internalBody = rawBody;
+    var transferencoding = entity.header('Content-Transfer-Encoding');
+
+    var _ref = contentType || {},
+        _ref$params = _ref.params;
+
+    _ref$params = _ref$params === void 0 ? {} : _ref$params;
+    var _ref$params$charset = _ref$params.charset,
+        charset = _ref$params$charset === void 0 ? '' : _ref$params$charset;
+    var transform = [];
+
+    if (transferencoding === 'base64') {
+      transform.push(encoding.decodeBase64);
+    } else if (transferencoding === 'quoted-printable') {
+      transform.push(encoding.decodeQP);
+    }
+
+    if (charset.replace(/-/g, '').toLowerCase() === 'utf8') {
+      transform.push(encoding.decodeUTF8);
+    }
+
+    entity.internalBody = transform.reduce(function (body, cb) {
+      return cb(body);
+    }, rawBody);
   }
 
   return true;
@@ -447,9 +461,10 @@ function parseHeader(entity, rawHeader) {
 function parseHeaderValue(rule, value) {
   var parsedValue;
   var data = {};
+  var decodedvalue = value.split(';').map(rfc2047.decode).join(';');
 
   if (typeof rule.reg !== 'function') {
-    parsedValue = value.match(rule.reg);
+    parsedValue = decodedvalue.match(rule.reg);
 
     if (!parsedValue) {
       throw new Error('parseHeaderValue() failed for ' + value);
@@ -463,7 +478,7 @@ function parseHeaderValue(rule, value) {
       }
     }
   } else {
-    data = rule.reg(value);
+    data = rule.reg(decodedvalue);
 
     if (!data) {
       throw new Error('parseHeaderValue() failed for ' + value);
@@ -471,10 +486,9 @@ function parseHeaderValue(rule, value) {
   }
 
   if (!data.value) {
-    data.value = value;
+    data.value = decodedvalue;
   }
 
-  data.value = rfc2047.decode(data.value);
   return data;
 }
 
@@ -589,7 +603,11 @@ Entity.prototype.toString = function () {
   if (!options.noHeaders) {
     // MIME headers.
     var headers = Object.keys(this.headers).map(function (name) {
-      return name + ': ' + encode(_this.headers[name].value) + '\r\n';
+      var val = _this.headers[name].value;
+      var list = val.split(';').map(function (val) {
+        return val.split('=').map(encode).join('=');
+      });
+      return name + ': ' + list.join(';') + '\r\n';
     });
     raw = headers.join('') + '\r\n';
   } // Body.
@@ -613,13 +631,27 @@ Entity.prototype.toString = function () {
     var _ref = this.headers['Content-Transfer-Encoding'] || {},
         value = _ref.value;
 
-    if (value === 'base64') {
-      raw += encoding.encodeBase64(this.internalBody);
-    } else if (value === 'quoted-printable') {
-      raw += encoding.encodeQP(this.internalBody);
-    } else {
-      raw += this.internalBody;
+    var _ref2 = this.contentType() || {},
+        _ref2$params = _ref2.params;
+
+    _ref2$params = _ref2$params === void 0 ? {} : _ref2$params;
+    var _ref2$params$charset = _ref2$params.charset,
+        charset = _ref2$params$charset === void 0 ? '' : _ref2$params$charset;
+    var transform = [];
+
+    if (charset.replace(/-/g, '').toLowerCase() === 'utf8') {
+      transform.push(encoding.encodeUTF8);
     }
+
+    if (value === 'base64') {
+      transform.push(encoding.encodeBase64);
+    } else if (value === 'quoted-printable') {
+      transform.push(encoding.encodeQP);
+    }
+
+    raw += transform.reduce(function (body, cb) {
+      return cb(body);
+    }, this.internalBody);
   } else if (_typeof(this.internalBody) === 'object') {
     raw += JSON.stringify(this.internalBody);
   }
